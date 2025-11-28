@@ -56,9 +56,18 @@ class NotificationManager:
         # Load the previous statuses from the file
         statuses = self.__load_statuses()
 
-        # Always save current status and send notification
-        self.__save_current_status(current_status)
-        self.__send_notifications(res)
+        # Check if status has changed
+        should_notify = False
+        if not statuses:
+            should_notify = True
+        elif statuses[-1]["status"] != current_status:
+            should_notify = True
+        
+        if should_notify:
+            self.__save_current_status(current_status)
+            self.__send_notifications(res)
+        else:
+            print(f"Status unchanged ({current_status}). No notification sent.")
 
 
     def __load_statuses(self) -> list:
