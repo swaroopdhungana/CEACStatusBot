@@ -56,16 +56,26 @@ class NotificationManager:
         # Load the previous statuses from the file
         statuses = self.__load_statuses()
 
+        # Check if manually triggered (workflow_dispatch)
+        is_manual_trigger = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
+        
         # Check if status has changed
         should_notify = False
         if not statuses:
             should_notify = True
         elif statuses[-1]["status"] != current_status:
             should_notify = True
+        
+        # Always notify on manual trigger
+        if is_manual_trigger:
+            should_notify = True
+            print("Manual trigger detected - will send notification regardless of status change")
 
         if should_notify:
-            self.__save_current_status(res)
-            self.__send_notifications(res)
+            # Only save status if it actually changed
+            if not statuses or statuses[-1]["status"] != current_status:
+                self.__save_current_status(res)
+            self.__send_notifications(res, is_manual_trigger)
 
 
     def __load_statuses(self) -> list:
@@ -84,8 +94,8 @@ class NotificationManager:
         with open(self.__status_file, "w") as file:
             json.dump({"statuses": statuses}, file)
 
-    def __send_notifications(self, res: dict) -> None:
-        if res["status"] == "Refused":
+    def __send_notifications(self, res: dict, is_manual_trigger: bool = False) -> None:
+        if res["status"] == "Refused" and not is_manual_trigger:
             try:
                 TIMEZONE = os.environ["TIMEZONE"]
                 localTimeZone = pytz.timezone(TIMEZONE)
@@ -106,6 +116,9 @@ class NotificationManager:
                     "No notification sent for Refused status."
                 )
                 return
+
+        if is_manual_trigger:
+            print("Manual trigger - bypassing active hours check")
 
         for notificationHandle in self.__handleList:
             notificationHandle.send(res)
