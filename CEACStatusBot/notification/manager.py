@@ -52,7 +52,7 @@ class NotificationManager:
             self.__captchaHandle,
         )
         current_status = res["status"]
-        print(f"Current status: {current_status} - Last updated: {res['case_last_updated']}")
+        
         # Load the previous statuses from the file
         statuses = self.__load_statuses()
 
@@ -62,12 +62,10 @@ class NotificationManager:
             should_notify = True
         elif statuses[-1]["status"] != current_status:
             should_notify = True
-        
+
         if should_notify:
             self.__save_current_status(res)
             self.__send_notifications(res)
-        else:
-            print(f"Status unchanged ({current_status}). No notification sent.")
 
 
     def __load_statuses(self) -> list:
@@ -79,7 +77,6 @@ class NotificationManager:
     def __save_current_status(self, res: dict) -> None:
         statuses = self.__load_statuses()
         statuses.append({
-            "time": res["time"],
             "status": res["status"],
             "last_updated_date": res["case_last_updated"]
         })
