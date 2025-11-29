@@ -64,7 +64,7 @@ class NotificationManager:
             should_notify = True
         
         if should_notify:
-            self.__save_current_status(current_status)
+            self.__save_current_status(res)
             self.__send_notifications(res)
         else:
             print(f"Status unchanged ({current_status}). No notification sent.")
@@ -76,9 +76,13 @@ class NotificationManager:
                 return json.load(file).get("statuses", [])
         return []
 
-    def __save_current_status(self, status: str) -> None:
+    def __save_current_status(self, res: dict) -> None:
         statuses = self.__load_statuses()
-        statuses.append({"status": status, "date": datetime.datetime.now().isoformat()})
+        statuses.append({
+            "time": res["time"],
+            "status": res["status"],
+            "last_updated_date": res["case_last_updated"]
+        })
 
         with open(self.__status_file, "w") as file:
             json.dump({"statuses": statuses}, file)
