@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *" # Every 30 minutes
+    - cron: "0 */2 * * *" # Every 2 hours
 
 jobs:
   build:
