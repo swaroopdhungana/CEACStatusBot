@@ -23,8 +23,8 @@ class EmailNotificationHandle(NotificationHandle):
         
         # {'success': True, 'visa_type': 'NONIMMIGRANT VISA APPLICATION', 'status': 'Issued', 'case_created': '30-Aug-2022', 'case_last_updated': '19-Oct-2022', 'description': 'Your visa is in final processing. If you have not received it in more than 10 working days, please see the webpage for contact information of the embassy or consulate where you submitted your application.', 'application_num': '***'}
 
-        mail_title = 'Visa({}): {}'.format(result['status'], result['case_last_updated'])
-        mail_content = result['description']
+        mail_title = result['case_last_updated']
+        mail_content = result['case_last_updated']
 
         msg = MIMEMultipart()
         msg["Subject"] = Header(mail_title,'utf-8')

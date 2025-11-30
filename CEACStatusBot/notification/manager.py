@@ -59,23 +59,13 @@ class NotificationManager:
         # Check if manually triggered (workflow_dispatch)
         is_manual_trigger = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
         
-        # Check if status has changed
-        should_notify = False
-        if not statuses:
-            should_notify = True
-        elif statuses[-1]["status"] != current_status:
-            should_notify = True
+        # Always send notification (frequency set to "always")
+        print("Sending notification (frequency: always)")
         
-        # Always notify on manual trigger
-        if is_manual_trigger:
-            should_notify = True
-            print("Manual trigger detected - will send notification regardless of status change")
-
-        if should_notify:
-            # Only save status if it actually changed
-            if not statuses or statuses[-1]["status"] != current_status:
-                self.__save_current_status(res)
-            self.__send_notifications(res, is_manual_trigger)
+        # Only save status if it actually changed
+        if not statuses or statuses[-1]["status"] != current_status:
+            self.__save_current_status(res)
+        self.__send_notifications(res, is_manual_trigger)
 
 
     def __load_statuses(self) -> list:
